@@ -7,6 +7,9 @@
 🌐 **Demo**  
 https://pluto007-lab.github.io/career-track/
 
+📦 **Repository**  
+https://github.com/pluto007-lab/career-track
+
 ---
 
 ## Overview
@@ -47,7 +50,7 @@ Career Trackは、それらを一つのアプリで管理し、「今確認す�
 - 評価理由の表示
 - 手動調整
 
-- ### 🔍 一覧機能
+### 🔍 一覧機能
 
 - リアルタイム検索
 - 応募媒体フィルター
@@ -179,4 +182,28 @@ pnpm install
 pnpm dev
 ```
 
-現在も就職活動で実際に利用しながら改善を続けており、今後はクラウド同期やGoogleサービスとの連携など、より実用的な機能を追加していく予定です。
+---
+
+## Future
+
+現在も就職活動で実際に利用しながら改善を続けており、
+今後はクラウド同期やGoogleサービスとの連携など、
+より実用的な機能を追加していく予定です。
+
+## Screenshots
+
+### Dashboard
+
+![Dashboard](img/dashboard.png)
+
+### Company List
+
+![Company List](img/company-list.png)
+
+### Company Detail
+
+![Company Detail](img/company-detail.png)
+
+## License
+
+This project is released under the MIT License.
