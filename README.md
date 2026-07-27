@@ -47,12 +47,19 @@ Career Trackは、それらを一つのアプリで管理し、「今確認す�
 - 評価理由の表示
 - 手動調整
 
-### 🔍 一覧機能
+- ### 🔍 一覧機能
 
 - リアルタイム検索
 - 応募媒体フィルター
 - 状況フィルター
 - 選考状況タブ
+  - すべて
+  - 選考中
+  - 結果待ち
+  - 面接予定
+  - 内定
+  - 不採用
+  - アーカイブ
 - 登録日・応募日・更新日など複数の並べ替え
 
 ### 📱 Responsive
@@ -80,10 +87,10 @@ PC・タブレット・スマートフォン対応
 
 ## Technical Highlights
 
-- applicationStatusを一元管理
-- LocalStorageとの後方互換
-- JSTの日付処理
-- 説明可能な評価ロジック
+- `applicationStatus`を中心に、一覧・検索・絞り込み・タブ表示を共通ロジックで管理
+- LocalStorageの既存データを壊さない後方互換設計
+- タイムゾーンの違いによる日付ずれを防ぐJST基準の日付処理
+- 企業評価はルールベースで算出し、評価理由を表示する説明可能な設計
 
 ---
 
@@ -133,3 +140,44 @@ PC・タブレット・スマートフォン対応
 - [ ] タブやメニューへのアイコン追加
 - [ ] 情報設計の改善
 - [ ] アクセシビリティの向上
+
+---
+
+## Tech Stack
+
+### Frontend
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- React Router
+
+### Storage
+
+- LocalStorage
+
+### Development
+
+- Git
+- GitHub
+- ESLint
+- pnpm
+- Visual Studio Code
+
+---
+
+## Setup
+
+```bash
+git clone https://github.com/pluto007-lab/career-track.git
+
+cd career-track
+
+pnpm install
+
+pnpm dev
+---
+
+```md
+現在も就職活動で実際に利用しながら改善を続けており、今後はクラウド同期やGoogleサービスとの連携など、より実用的な機能を追加していく予定です。
