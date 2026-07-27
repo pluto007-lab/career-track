@@ -50,6 +50,8 @@ Career Trackは、それらを一つのアプリで管理し、「今確認す�
 
 ![Company Detail](img/company-detail.png)
 
+---
+
 ## Features
 
 ### 📁 企業管理
