@@ -1,3 +1,8 @@
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss)
+
 # Career Track
 
 > 就職活動を効率化するために開発した、企業・応募・面接を一元管理できるWebアプリ
@@ -5,10 +10,10 @@
 ![Career Track](img/preview.png)
 
 🌐 **Demo**  
-https://pluto007-lab.github.io/career-track/
+<https://pluto007-lab.github.io/career-track/>
 
 📦 **Repository**  
-https://github.com/pluto007-lab/career-track
+<https://github.com/pluto007-lab/career-track>
 
 ---
 
@@ -27,7 +32,23 @@ https://github.com/pluto007-lab/career-track
 
 Career Trackは、それらを一つのアプリで管理し、「今確認すべき企業」と「次にやるべきこと」が分かるようにすることを目的として制作しました。
 
+実際に日々の就職活動で使用しながら改善を続けている、実践型の個人開発プロジェクトです。
+
 ---
+
+## Screenshots
+
+### Dashboard
+
+![Dashboard](img/dashboard.png)
+
+### Company List
+
+![Company List](img/company-list.png)
+
+### Company Detail
+
+![Company Detail](img/company-detail.png)
 
 ## Features
 
@@ -168,6 +189,11 @@ PC・タブレット・スマートフォン対応
 - pnpm
 - Visual Studio Code
 
+### AI
+
+- ChatGPT
+- Codex
+
 ---
 
 ## Setup
@@ -186,23 +212,10 @@ pnpm dev
 
 ## Future
 
-現在も就職活動で実際に利用しながら改善を続けており、
+Career Trackは、現在も実際の就職活動で利用しながら継続的に改善しています。
+
 今後はクラウド同期やGoogleサービスとの連携など、
 より実用的な機能を追加していく予定です。
-
-## Screenshots
-
-### Dashboard
-
-![Dashboard](img/dashboard.png)
-
-### Company List
-
-![Company List](img/company-list.png)
-
-### Company Detail
-
-![Company Detail](img/company-detail.png)
 
 ## License
 
