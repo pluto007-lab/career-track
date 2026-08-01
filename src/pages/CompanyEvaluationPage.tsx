@@ -478,7 +478,7 @@ export function CompanyEvaluationPage() {
     <div className="mx-auto max-w-5xl px-4 py-7 sm:px-6 lg:px-8">
       <PageHeader
         title="企業を評価"
-        description={`${companyName}の評価を入力します。`}
+        description={`${companyName}の評価と、応募判断に使うメモを管理します。`}
         action={
           <div className="flex flex-wrap gap-2">
             <Link
@@ -498,6 +498,18 @@ export function CompanyEvaluationPage() {
           </div>
         }
       />
+
+      <div className="mb-5 flex flex-col gap-2 text-sm leading-6 text-slate-600 sm:flex-row sm:items-center sm:justify-between">
+        <p>
+          点数に加えて、良い点・気になる点・面接で確認したいこと・自由メモ・総評を管理できます。
+        </p>
+        <a
+          href="#evaluation-reference-information"
+          className="shrink-0 font-semibold text-teal-700 underline decoration-teal-300 underline-offset-4 hover:text-teal-900"
+        >
+          評価の参考情報へ移動
+        </a>
+      </div>
 
       {storageError && (
         <div
@@ -796,7 +808,10 @@ export function CompanyEvaluationPage() {
         </div>
       </div>
 
-      <section className="mt-6 border border-slate-200 bg-white p-5 sm:p-6">
+      <section
+        id="evaluation-reference-information"
+        className="mt-6 scroll-mt-20 border border-slate-200 bg-white p-5 sm:p-6"
+      >
         <div className="border-b border-slate-200 pb-4">
           <h2 className="text-base font-semibold text-slate-950">
             評価の参考情報

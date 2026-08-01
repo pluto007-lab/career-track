@@ -773,17 +773,21 @@ export function CompanyListPage() {
                           </Link>
                           <Link
                             to={`/companies/${company.id}/evaluate`}
+                            aria-label={`${company.name}の評価・メモを開く`}
+                            title="点数・総評・良い点・気になる点・面接確認事項を管理"
                             className="inline-flex h-9 items-center gap-2 rounded-md border border-teal-300 bg-white px-3 text-sm font-semibold text-teal-800 hover:bg-teal-50"
                           >
                             <BarChart3 aria-hidden="true" size={15} />
-                            評価
+                            評価・メモ
                           </Link>
                           <Link
                             to={`/companies/${company.id}/edit`}
+                            aria-label={`${company.name}の企業情報を編集`}
+                            title="会社情報・応募状況・日程を編集"
                             className="inline-flex h-9 items-center gap-2 rounded-md border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
                           >
                             <Pencil aria-hidden="true" size={15} />
-                            編集
+                            企業情報
                           </Link>
                           {activeTab !== "archived" ? (
                             <button
@@ -925,17 +929,21 @@ export function CompanyListPage() {
                   </Link>
                   <Link
                     to={`/companies/${company.id}/evaluate`}
+                    aria-label={`${company.name}の評価・メモを開く`}
+                    title="点数・総評・良い点・気になる点・面接確認事項を管理"
                     className="inline-flex h-10 min-w-0 items-center justify-center gap-1 rounded-md border border-teal-300 bg-white px-2 text-xs font-semibold text-teal-800 hover:bg-teal-50"
                   >
                     <BarChart3 aria-hidden="true" size={16} />
-                    評価
+                    評価・メモ
                   </Link>
                   <Link
                     to={`/companies/${company.id}/edit`}
+                    aria-label={`${company.name}の企業情報を編集`}
+                    title="会社情報・応募状況・日程を編集"
                     className="inline-flex h-10 min-w-0 items-center justify-center gap-1 rounded-md border border-slate-300 bg-white px-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                   >
                     <Pencil aria-hidden="true" size={16} />
-                    編集
+                    企業情報
                   </Link>
                 </div>
                 <div className="mt-2 flex justify-end">

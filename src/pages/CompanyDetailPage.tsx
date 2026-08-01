@@ -197,17 +197,21 @@ export function CompanyDetailPage() {
       <div className="mb-6 flex flex-wrap gap-2">
         <Link
           to={`/companies/${company.id}/edit`}
+          aria-label={`${company.name}の企業情報を編集`}
+          title="会社情報・応募状況・日程を編集"
           className="inline-flex h-10 items-center gap-2 rounded-md bg-teal-700 px-4 text-sm font-semibold text-white hover:bg-teal-800"
         >
           <Pencil aria-hidden="true" size={17} />
-          編集
+          企業情報
         </Link>
         <Link
           to={`/companies/${company.id}/evaluate`}
+          aria-label={`${company.name}の評価・メモを開く`}
+          title="点数・総評・良い点・気になる点・面接確認事項を管理"
           className="inline-flex h-10 items-center gap-2 rounded-md border border-teal-300 bg-white px-4 text-sm font-semibold text-teal-800 hover:bg-teal-50"
         >
           <BarChart3 aria-hidden="true" size={17} />
-          評価
+          評価・メモ
         </Link>
         <Link
           to={`/companies/${company.id}/motivation`}
@@ -216,6 +220,11 @@ export function CompanyDetailPage() {
           <MessageSquareText aria-hidden="true" size={17} />
           志望動機
         </Link>
+      </div>
+
+      <div className="mb-6 flex flex-col gap-1 text-xs leading-5 text-slate-500 sm:flex-row sm:flex-wrap sm:gap-x-6">
+        <p><span className="font-semibold text-slate-700">企業情報：</span>会社情報・応募状況・日程を編集</p>
+        <p><span className="font-semibold text-slate-700">評価・メモ：</span>点数・総評・良い点・気になる点・面接確認事項を管理</p>
       </div>
 
       <div className="space-y-6">
