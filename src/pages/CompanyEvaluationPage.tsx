@@ -76,6 +76,14 @@ export function CompanyEvaluationPage() {
   const [jobPostingText, setJobPostingText] = useState("");
   const [savedEvaluationStatus, setSavedEvaluationStatus] =
     useState<EvaluationStatus>("unrated");
+  const [overallReview, setOverallReview] = useState("");
+  const [strengths, setStrengths] = useState("");
+  const [concerns, setConcerns] = useState("");
+  const [
+    interviewConfirmationPoints,
+    setInterviewConfirmationPoints,
+  ] = useState("");
+  const [notes, setNotes] = useState("");
   const [scores, setScores] =
     useState<DecisionCompanyScores | null>(null);
   const [applicantProfile, setApplicantProfile] =
@@ -136,6 +144,11 @@ export function CompanyEvaluationPage() {
     setJobPostingText(company.jobPostingText);
     setApplicantProfile(profileResult.value);
     setSavedEvaluationStatus(evaluation.status);
+    setOverallReview(evaluation.overallReview);
+    setStrengths(company.strengths);
+    setConcerns(company.concerns);
+    setInterviewConfirmationPoints(company.interviewConfirmationPoints);
+    setNotes(company.notes);
     setScores(sanitizeDecisionScores(evaluation.scores));
     setScoreDetails(evaluation.scoreDetails ?? null);
     setJudgmentSelection(evaluation.judgmentSelection);
@@ -299,9 +312,15 @@ export function CompanyEvaluationPage() {
     const nextCompanies = readResult.value.map((company, index) =>
       index === companyIndex
         ? {
-            ...company,
-            decisionEvaluation: {
+          ...company,
+          strengths: strengths.trim(),
+          concerns: concerns.trim(),
+          interviewConfirmationPoints:
+            interviewConfirmationPoints.trim(),
+          notes: notes.trim(),
+          decisionEvaluation: {
               status: "rated" as const,
+              overallReview: overallReview.trim(),
               scores: safeScores,
               scoreDetails: sanitizedScoreDetails,
               autoScore: totalScore,
@@ -414,6 +433,10 @@ export function CompanyEvaluationPage() {
         : undefined,
     displayedJudgment,
     screeningWarnings,
+    strengths,
+    concerns,
+    interviewConfirmationPoints,
+    notes,
     jobPostingText,
     jobPostingInclusion,
   });
@@ -711,6 +734,15 @@ export function CompanyEvaluationPage() {
                 </div>
               </div>
             )}
+
+            {interviewConfirmationPoints.trim() && (
+              <div className="mt-4 border border-sky-200 bg-sky-50 p-3 text-sky-900">
+                <p className="text-sm font-semibold">確認待ち事項あり</p>
+                <p className="mt-1 text-xs leading-5">
+                  面接で確認したいことが登録されています。未確認情報のため、自動減点や判定上限には使用していません。
+                </p>
+              </div>
+            )}
           </section>
 
           <section className="border border-slate-200 bg-white p-5">
@@ -763,6 +795,110 @@ export function CompanyEvaluationPage() {
           </section>
         </div>
       </div>
+
+      <section className="mt-6 border border-slate-200 bg-white p-5 sm:p-6">
+        <div className="border-b border-slate-200 pb-4">
+          <h2 className="text-base font-semibold text-slate-950">
+            評価の参考情報
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            以下の記述内容も、総合判定や総評を考える際の参考情報として扱います。
+          </p>
+        </div>
+
+        <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          <label className="block">
+            <span className="text-sm font-medium text-slate-800">
+              良い点
+            </span>
+            <span className="mt-1 block text-xs text-slate-500">
+              評価を上げる判断の参考にします。
+            </span>
+            <textarea
+              value={strengths}
+              onChange={(event) => {
+                setStrengths(event.target.value);
+                markChanged();
+              }}
+              className="mt-2 min-h-36 w-full resize-y rounded-md border border-slate-300 bg-white px-3 py-3 text-sm leading-7 text-slate-900 outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
+            />
+          </label>
+
+          <label className="block">
+            <span className="text-sm font-medium text-slate-800">
+              気になる点
+            </span>
+            <span className="mt-1 block text-xs text-slate-500">
+              慎重な判定や減点判断の参考にします。
+            </span>
+            <textarea
+              value={concerns}
+              onChange={(event) => {
+                setConcerns(event.target.value);
+                markChanged();
+              }}
+              className="mt-2 min-h-36 w-full resize-y rounded-md border border-slate-300 bg-white px-3 py-3 text-sm leading-7 text-slate-900 outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
+            />
+          </label>
+
+          <label className="block">
+            <span className="text-sm font-medium text-slate-800">
+              面接で確認したいこと
+            </span>
+            <span className="mt-1 block text-xs text-slate-500">
+              未確認事項として扱い、入力されているだけでは減点しません。
+            </span>
+            <textarea
+              value={interviewConfirmationPoints}
+              onChange={(event) => {
+                setInterviewConfirmationPoints(event.target.value);
+                markChanged();
+              }}
+              className="mt-2 min-h-36 w-full resize-y rounded-md border border-slate-300 bg-white px-3 py-3 text-sm leading-7 text-slate-900 outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
+            />
+          </label>
+
+          <label className="block">
+            <span className="text-sm font-medium text-slate-800">
+              自由メモ
+            </span>
+            <span className="mt-1 block text-xs text-slate-500">
+              評価に関係する補足情報を記録できます。
+            </span>
+            <textarea
+              value={notes}
+              onChange={(event) => {
+                setNotes(event.target.value);
+                markChanged();
+              }}
+              className="mt-2 min-h-36 w-full resize-y rounded-md border border-slate-300 bg-white px-3 py-3 text-sm leading-7 text-slate-900 outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
+            />
+          </label>
+        </div>
+      </section>
+
+      <section className="mt-6 border border-slate-200 bg-white p-5 sm:p-6">
+        <div className="border-b border-slate-200 pb-4">
+          <h2 className="text-base font-semibold text-slate-950">
+            総評
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            点数だけでは表せない印象や、応募判断の理由を記録できます。
+          </p>
+        </div>
+        <label className="mt-5 block">
+          <span className="sr-only">企業の総評</span>
+          <textarea
+            value={overallReview}
+            onChange={(event) => {
+              setOverallReview(event.target.value);
+              markChanged();
+            }}
+            placeholder="仕事内容との相性、期待している点、懸念点などを自由に入力してください。"
+            className="min-h-48 w-full resize-y rounded-md border border-slate-300 bg-white px-3 py-3 text-sm leading-7 text-slate-900 outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
+          />
+        </label>
+      </section>
 
       <details className="mt-6 border border-slate-200 bg-white">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-5 sm:px-6">

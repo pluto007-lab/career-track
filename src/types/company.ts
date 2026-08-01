@@ -95,6 +95,7 @@ export interface EvaluationScoreDetail {
 
 export interface DecisionEvaluation {
   status: EvaluationStatus;
+  overallReview: string;
   scores: DecisionCompanyScores;
   scoreDetails?: Partial<
     Record<keyof DecisionCompanyScores, EvaluationScoreDetail>
@@ -211,6 +212,7 @@ export interface Company {
   webAppDevelopment: ChoiceValue;
   strengths: string;
   concerns: string;
+  interviewConfirmationPoints: string;
   redFlags: string;
   notes: string;
   motivationAppeal: string;

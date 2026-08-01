@@ -1,6 +1,7 @@
 import {
   Building2,
   ClipboardList,
+  DatabaseBackup,
   ChevronLeft,
   ChevronRight,
   LayoutDashboard,
@@ -28,6 +29,12 @@ const navigation = [
     to: "/settings/profile",
     label: "応募者プロフィール",
     icon: UserRound,
+    end: true,
+  },
+  {
+    to: "/settings/data",
+    label: "データ管理",
+    icon: DatabaseBackup,
     end: true,
   },
 ];
@@ -277,7 +284,9 @@ export function AppLayout() {
         aria-label="モバイルナビゲーション"
         className="fixed inset-x-0 bottom-0 z-20 grid h-18 grid-cols-5 border-t border-slate-200 bg-white px-1 pb-[env(safe-area-inset-bottom)] lg:hidden"
       >
-        {navigation.map(({ to, label, icon: Icon, end }) => (
+        {navigation
+          .filter(({ to }) => to !== "/settings/data")
+          .map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
@@ -294,7 +303,7 @@ export function AppLayout() {
               {label}
             </span>
           </NavLink>
-        ))}
+          ))}
       </nav>
     </div>
   );

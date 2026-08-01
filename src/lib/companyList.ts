@@ -51,6 +51,7 @@ export const COMPANY_LIST_TAB_LABELS: Record<CompanyListTab, string> = {
   waiting_for_result: "結果待ち",
   interview_scheduled: "面接予定",
   offer: "内定",
+  withdrawn: "辞退",
   rejected: "不採用",
   archived: "アーカイブ",
 };
@@ -61,6 +62,7 @@ export const COMPANY_LIST_TAB_ORDER: readonly CompanyListTab[] = [
   "waiting_for_result",
   "interview_scheduled",
   "offer",
+  "withdrawn",
   "rejected",
   "archived",
 ];
@@ -103,6 +105,7 @@ export const COMPANY_LIST_TAB_STATUSES: Record<
     "final_interview_scheduled",
   ],
   offer: ["offer"],
+  withdrawn: ["withdrawn"],
   rejected: ["rejected"],
 };
 
@@ -143,10 +146,39 @@ export function createCompanyListTabCounts(
       waiting_for_result: 0,
       interview_scheduled: 0,
       offer: 0,
+      withdrawn: 0,
       rejected: 0,
       archived: 0,
     },
   );
+}
+
+const ACTUALLY_APPLIED_STATUSES: ReadonlySet<ApplicationStatus> =
+  new Set([
+    "applied",
+    "waiting_for_reply",
+    "scheduling",
+    "document_screening",
+    "document_passed",
+    "casual_interview_scheduled",
+    "first_interview_scheduled",
+    "first_interview_completed",
+    "second_interview_scheduled",
+    "second_interview_completed",
+    "final_interview_scheduled",
+    "final_interview_completed",
+    "waiting_for_result",
+    "offer",
+    "rejected",
+    "withdrawn",
+  ]);
+
+export function countActuallyAppliedCompanies(
+  companies: Company[],
+): number {
+  return companies.filter((company) =>
+    ACTUALLY_APPLIED_STATUSES.has(company.applicationStatus),
+  ).length;
 }
 
 const STATUS_GROUPS: Record<ApplicationStatus, ApplicationStatusGroup> = {

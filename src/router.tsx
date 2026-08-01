@@ -9,6 +9,8 @@ import { CompanyEvaluationPage } from "./pages/CompanyEvaluationPage";
 import { ApplicantProfilePage } from "./pages/ApplicantProfilePage";
 import { CompanyMotivationPage } from "./pages/CompanyMotivationPage";
 import { ApplicationManagementPage } from "./pages/ApplicationManagementPage";
+import { CompanyDetailPage } from "./pages/CompanyDetailPage";
+import { DataManagementPage } from "./pages/DataManagementPage";
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +22,7 @@ export const router = createBrowserRouter([
       { path: "companies", element: <CompanyListPage /> },
       { path: "applications", element: <ApplicationManagementPage /> },
       { path: "companies/new", element: <CompanyFormPage /> },
+      { path: "companies/:companyId", element: <CompanyDetailPage /> },
       { path: "companies/:companyId/edit", element: <CompanyFormPage /> },
       {
         path: "companies/:companyId/evaluate",
@@ -33,6 +36,7 @@ export const router = createBrowserRouter([
         path: "settings/profile",
         element: <ApplicantProfilePage />,
       },
+      { path: "settings/data", element: <DataManagementPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],
   },

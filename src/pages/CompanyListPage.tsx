@@ -4,6 +4,8 @@ import {
   ArchiveRestore,
   BarChart3,
   Building2,
+  ChevronDown,
+  ChevronRight,
   MessageSquareText,
   Pencil,
   Plus,
@@ -30,6 +32,7 @@ import {
   APPLICATION_STATUS_GROUP_ORDER,
   COMPANY_LIST_TAB_LABELS,
   COMPANY_LIST_TAB_ORDER,
+  countActuallyAppliedCompanies,
   createApplicationSourceFilterOptions,
   createCompanyListTabCounts,
   filterCompaniesBySelections,
@@ -134,6 +137,15 @@ function ApplicationStatusBadge({ company }: { company: Company }) {
   );
 }
 
+type CompanyListDisplayItem =
+  | Company
+  | { marker: "ended-toggle" }
+  | {
+      marker: "ended-heading";
+      status: "withdrawn" | "rejected";
+      count: number;
+    };
+
 export function CompanyListPage() {
   const [initialPreferences] = useState(() => {
     const result = companyListPreferencesStorage.read();
@@ -156,6 +168,8 @@ export function CompanyListPage() {
     statusGroups: [],
   });
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isEndedSelectionOpen, setIsEndedSelectionOpen] =
+    useState(false);
   const [sortKey, setSortKey] = useState<CompanyListSortKey>(
     initialPreferences.sortKey,
   );
@@ -202,6 +216,60 @@ export function CompanyListPage() {
   );
   const activeFilterCount =
     filters.sources.length + filters.statusGroups.length;
+  const cumulativeAppliedCount = useMemo(
+    () => countActuallyAppliedCompanies(companies),
+    [companies],
+  );
+  const listItems = useMemo<CompanyListDisplayItem[]>(() => {
+    if (activeTab !== "all") {
+      return visibleCompanies;
+    }
+
+    const activeCompanies = visibleCompanies.filter(
+      (company) =>
+        company.applicationStatus !== "withdrawn" &&
+        company.applicationStatus !== "rejected",
+    );
+    const withdrawnCompanies = visibleCompanies.filter(
+      (company) => company.applicationStatus === "withdrawn",
+    );
+    const rejectedCompanies = visibleCompanies.filter(
+      (company) => company.applicationStatus === "rejected",
+    );
+    const items: CompanyListDisplayItem[] = [
+      ...activeCompanies,
+      { marker: "ended-toggle" },
+    ];
+
+    if (isEndedSelectionOpen) {
+      if (withdrawnCompanies.length > 0) {
+        items.push({
+          marker: "ended-heading",
+          status: "withdrawn",
+          count: withdrawnCompanies.length,
+        });
+        items.push(...withdrawnCompanies);
+      }
+      if (rejectedCompanies.length > 0) {
+        items.push({
+          marker: "ended-heading",
+          status: "rejected",
+          count: rejectedCompanies.length,
+        });
+        items.push(...rejectedCompanies);
+      }
+    }
+
+    return items;
+  }, [activeTab, isEndedSelectionOpen, visibleCompanies]);
+  const endedSelectionCount =
+    activeTab === "all"
+      ? visibleCompanies.filter(
+          (company) =>
+            company.applicationStatus === "withdrawn" ||
+            company.applicationStatus === "rejected",
+        ).length
+      : 0;
 
   const clearFilters = () => {
     setFilters({ sources: [], statusGroups: [] });
@@ -212,6 +280,7 @@ export function CompanyListPage() {
     setQuery("");
     clearFilters();
     setIsFiltersOpen(false);
+    setIsEndedSelectionOpen(false);
   };
 
   const toggleSourceFilter = (value: string) => {
@@ -296,6 +365,22 @@ export function CompanyListPage() {
         title="企業一覧"
         description="応募候補を同じ基準で比較し、優先順位を整理します。"
       />
+
+      {!storageError && (
+        <p className="-mt-3 mb-5 text-sm text-slate-600">
+          登録企業：
+          <span className="font-semibold tabular-nums text-slate-900">
+            {companies.length}社
+          </span>
+          <span className="mx-2 text-slate-300" aria-hidden="true">
+            |
+          </span>
+          累計応募：
+          <span className="font-semibold tabular-nums text-slate-900">
+            {cumulativeAppliedCount}社
+          </span>
+        </p>
+      )}
 
       {companies.length > 0 && (
         <div
@@ -578,7 +663,58 @@ export function CompanyListPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
-                  {visibleCompanies.map((company) => (
+                  {listItems.map((item) => {
+                    if ("marker" in item) {
+                      if (item.marker === "ended-toggle") {
+                        return (
+                          <tr key="ended-toggle">
+                            <td colSpan={8} className="p-0">
+                              <button
+                                type="button"
+                                aria-expanded={isEndedSelectionOpen}
+                                disabled={endedSelectionCount === 0}
+                                onClick={() =>
+                                  setIsEndedSelectionOpen(
+                                    (current) => !current,
+                                  )
+                                }
+                                className="flex w-full items-center gap-2 border-t border-slate-300 bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-800 hover:bg-slate-100 disabled:cursor-default disabled:text-slate-500"
+                              >
+                                {isEndedSelectionOpen ? (
+                                  <ChevronDown
+                                    aria-hidden="true"
+                                    size={17}
+                                  />
+                                ) : (
+                                  <ChevronRight
+                                    aria-hidden="true"
+                                    size={17}
+                                  />
+                                )}
+                                終了した選考（{endedSelectionCount}件）
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      }
+
+                      return (
+                        <tr key={`ended-heading-${item.status}`}>
+                          <th
+                            colSpan={8}
+                            className="bg-white px-4 py-3 text-sm font-semibold text-slate-700"
+                          >
+                            {item.status === "withdrawn"
+                              ? "辞退"
+                              : "不採用"}
+                            （{item.count}件）
+                          </th>
+                        </tr>
+                      );
+                    }
+
+                    const company = item;
+                    return (
                     <tr
                       key={company.id}
                       className={[
@@ -592,7 +728,12 @@ export function CompanyListPage() {
                         scope="row"
                         className="max-w-56 px-4 py-4 font-semibold text-slate-950"
                       >
-                        <span className="block truncate">{company.name}</span>
+                        <Link
+                          to={`/companies/${company.id}`}
+                          className="block truncate text-slate-950 hover:text-teal-800 hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600"
+                        >
+                          {company.name}
+                        </Link>
                       </th>
                       <td className="whitespace-nowrap px-4 py-4">
                         <span className="inline-flex rounded-md border border-slate-200 bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
@@ -672,14 +813,51 @@ export function CompanyListPage() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           </div>
 
           <div className="space-y-3 md:hidden">
-            {visibleCompanies.map((company) => (
+            {listItems.map((item) => {
+              if ("marker" in item) {
+                if (item.marker === "ended-toggle") {
+                  return (
+                    <button
+                      key="ended-toggle"
+                      type="button"
+                      aria-expanded={isEndedSelectionOpen}
+                      disabled={endedSelectionCount === 0}
+                      onClick={() =>
+                        setIsEndedSelectionOpen((current) => !current)
+                      }
+                      className="flex w-full items-center gap-2 border-y border-slate-300 bg-slate-50 px-3 py-3 text-left text-sm font-semibold text-slate-800 hover:bg-slate-100 disabled:cursor-default disabled:text-slate-500"
+                    >
+                      {isEndedSelectionOpen ? (
+                        <ChevronDown aria-hidden="true" size={17} />
+                      ) : (
+                        <ChevronRight aria-hidden="true" size={17} />
+                      )}
+                      終了した選考（{endedSelectionCount}件）
+                    </button>
+                  );
+                }
+
+                return (
+                  <h2
+                    key={`ended-heading-${item.status}`}
+                    className="border-b border-slate-200 px-1 pb-2 pt-2 text-sm font-semibold text-slate-700"
+                  >
+                    {item.status === "withdrawn" ? "辞退" : "不採用"}
+                    （{item.count}件）
+                  </h2>
+                );
+              }
+
+              const company = item;
+              return (
               <article
                 key={company.id}
                 className={[
@@ -691,8 +869,13 @@ export function CompanyListPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h2 className="break-words text-base font-semibold text-slate-950">
-                      {company.name}
+                    <h2 className="break-words text-base font-semibold">
+                      <Link
+                        to={`/companies/${company.id}`}
+                        className="text-slate-950 hover:text-teal-800 hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600"
+                      >
+                        {company.name}
+                      </Link>
                     </h2>
                     <p className="mt-1 text-sm text-slate-600">
                       {company.jobTitle || "職種未設定"}
@@ -779,7 +962,8 @@ export function CompanyListPage() {
                   )}
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         </>
       )}

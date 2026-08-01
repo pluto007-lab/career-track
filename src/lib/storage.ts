@@ -102,7 +102,7 @@ type PersistedDecisionEvaluation = Partial<
   scores?: Partial<DecisionEvaluation["scores"]>;
 };
 
-type PersistedCompany = Omit<
+export type PersistedCompany = Omit<
   Company,
   | "archived"
   | "evaluationStatus"
@@ -112,6 +112,7 @@ type PersistedCompany = Omit<
   | "motivationAvoid"
   | "motivationStatement"
   | "companySelfPromotion"
+  | "interviewConfirmationPoints"
   | "applicationManagement"
   | "decisionEvaluation"
 > &
@@ -126,6 +127,7 @@ type PersistedCompany = Omit<
       | "motivationAvoid"
       | "motivationStatement"
       | "companySelfPromotion"
+      | "interviewConfirmationPoints"
       | "applicationManagement"
     >
   > & {
@@ -134,6 +136,7 @@ type PersistedCompany = Omit<
 
 const EMPTY_DECISION_EVALUATION: DecisionEvaluation = {
   status: "unrated",
+  overallReview: "",
   scores: {
     jobFit: 0,
     careerFit: 0,
@@ -151,6 +154,84 @@ const EMPTY_DECISION_EVALUATION: DecisionEvaluation = {
   judgmentSelection: { mode: "auto" },
 };
 
+export type NormalizationResult<T> =
+  | { ok: true; value: T }
+  | { ok: false; message: string };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function normalizeCompanies(value: unknown): NormalizationResult<Company[]> {
+  if (!Array.isArray(value)) {
+    return { ok: false, message: "企業データが配列ではありません。" };
+  }
+
+  const companies: Company[] = [];
+  for (const [index, item] of value.entries()) {
+    if (!isRecord(item) || typeof item.id !== "string" || !item.id.trim()) {
+      return { ok: false, message: `企業データ${index + 1}件目のIDが不正です。` };
+    }
+    if (typeof item.name !== "string" || !item.name.trim()) {
+      return { ok: false, message: `企業データ${index + 1}件目の会社名が不正です。` };
+    }
+
+    const company = item as PersistedCompany;
+    const legacyManagement = createLegacyApplicationManagement(
+      company.nextActionDate,
+      company.documentDeadline,
+    );
+    const persistedManagement = company.applicationManagement;
+    const applicationManagement: ApplicationManagement = persistedManagement
+      ? {
+          nextEventAt: persistedManagement.nextEventAt,
+          documentDeadline: persistedManagement.documentDeadline,
+          responseDeadline: persistedManagement.responseDeadline,
+          notes: persistedManagement.notes ?? "",
+        }
+      : legacyManagement;
+
+    companies.push({
+      ...company,
+      archived: company.archived ?? false,
+      evaluationStatus: company.evaluationStatus ?? "unrated",
+      jobPostingText: company.jobPostingText ?? "",
+      motivationAppeal: company.motivationAppeal ?? "",
+      motivationFocus: company.motivationFocus ?? "",
+      motivationAvoid: company.motivationAvoid ?? "",
+      motivationStatement: company.motivationStatement ?? "",
+      companySelfPromotion: company.companySelfPromotion ?? "",
+      interviewConfirmationPoints: company.interviewConfirmationPoints ?? "",
+      applicationManagement,
+      decisionEvaluation: {
+        ...EMPTY_DECISION_EVALUATION,
+        ...company.decisionEvaluation,
+        scores: {
+          ...EMPTY_DECISION_EVALUATION.scores,
+          ...company.decisionEvaluation?.scores,
+        },
+        judgmentSelection:
+          company.decisionEvaluation?.judgmentSelection ??
+          EMPTY_DECISION_EVALUATION.judgmentSelection,
+      },
+    });
+  }
+
+  return { ok: true, value: companies };
+}
+
+export function normalizeApplicantProfile(
+  value: unknown,
+): NormalizationResult<ApplicantProfile> {
+  if (!isRecord(value)) {
+    return { ok: false, message: "応募者プロフィールの形式が不正です。" };
+  }
+  return {
+    ok: true,
+    value: { ...EMPTY_APPLICANT_PROFILE, ...value } as ApplicantProfile,
+  };
+}
+
 export const companyStorage = {
   read: (): StorageResult<Company[]> => {
     const result = readStorage<PersistedCompany[]>(
@@ -162,49 +243,11 @@ export const companyStorage = {
       return { ok: false, value: [], error: result.error };
     }
 
-    return {
-      ok: true,
-      value: result.value.map((company) => {
-        const legacyManagement = createLegacyApplicationManagement(
-          company.nextActionDate,
-          company.documentDeadline,
-        );
-        const persistedManagement = company.applicationManagement;
-        const applicationManagement: ApplicationManagement =
-          persistedManagement
-            ? {
-                nextEventAt: persistedManagement.nextEventAt,
-                documentDeadline: persistedManagement.documentDeadline,
-                responseDeadline: persistedManagement.responseDeadline,
-                notes: persistedManagement.notes ?? "",
-              }
-            : legacyManagement;
-
-        return {
-          ...company,
-          archived: company.archived ?? false,
-          evaluationStatus: company.evaluationStatus ?? "unrated",
-          jobPostingText: company.jobPostingText ?? "",
-          motivationAppeal: company.motivationAppeal ?? "",
-          motivationFocus: company.motivationFocus ?? "",
-          motivationAvoid: company.motivationAvoid ?? "",
-          motivationStatement: company.motivationStatement ?? "",
-          companySelfPromotion: company.companySelfPromotion ?? "",
-          applicationManagement,
-          decisionEvaluation: {
-            ...EMPTY_DECISION_EVALUATION,
-            ...company.decisionEvaluation,
-            scores: {
-              ...EMPTY_DECISION_EVALUATION.scores,
-              ...company.decisionEvaluation?.scores,
-            },
-            judgmentSelection:
-              company.decisionEvaluation?.judgmentSelection ??
-              EMPTY_DECISION_EVALUATION.judgmentSelection,
-          },
-        };
-      }),
-    };
+    const normalized = normalizeCompanies(result.value);
+    if (!normalized.ok) {
+      return storageFailure("parse", STORAGE_KEYS.companies, normalized.message, []);
+    }
+    return normalized;
   },
   write: (companies: Company[]): StorageResult<undefined> =>
     writeStorage(STORAGE_KEYS.companies, companies),
@@ -225,10 +268,16 @@ export const profileStorage = {
       };
     }
 
-    return {
-      ok: true,
-      value: { ...EMPTY_APPLICANT_PROFILE, ...result.value },
-    };
+    const normalized = normalizeApplicantProfile(result.value);
+    if (!normalized.ok) {
+      return storageFailure(
+        "parse",
+        STORAGE_KEYS.applicantProfile,
+        normalized.message,
+        { ...EMPTY_APPLICANT_PROFILE },
+      );
+    }
+    return normalized;
   },
   write: (profile: ApplicantProfile): StorageResult<undefined> =>
     writeStorage(STORAGE_KEYS.applicantProfile, profile),
@@ -238,6 +287,24 @@ const defaultSettings: CareerTrackSettings = {
   appName: "Career Track",
   sidebarCollapsed: false,
 };
+
+export function normalizeSettings(
+  value: unknown,
+): NormalizationResult<CareerTrackSettings> {
+  if (!isRecord(value)) {
+    return { ok: false, message: "アプリ設定の形式が不正です。" };
+  }
+  if (value.appName !== undefined && typeof value.appName !== "string") {
+    return { ok: false, message: "アプリ名の形式が不正です。" };
+  }
+  if (
+    value.sidebarCollapsed !== undefined &&
+    typeof value.sidebarCollapsed !== "boolean"
+  ) {
+    return { ok: false, message: "サイドバー設定の形式が不正です。" };
+  }
+  return { ok: true, value: { ...defaultSettings, ...value } };
+}
 
 export const settingsStorage = {
   read: (): StorageResult<CareerTrackSettings> => {
@@ -254,10 +321,16 @@ export const settingsStorage = {
       };
     }
 
-    return {
-      ok: true,
-      value: { ...defaultSettings, ...result.value },
-    };
+    const normalized = normalizeSettings(result.value);
+    if (!normalized.ok) {
+      return storageFailure(
+        "parse",
+        STORAGE_KEYS.settings,
+        normalized.message,
+        defaultSettings,
+      );
+    }
+    return normalized;
   },
   write: (settings: CareerTrackSettings): StorageResult<undefined> =>
     writeStorage(STORAGE_KEYS.settings, settings),
@@ -280,6 +353,24 @@ const defaultCompanyListPreferences: CompanyListPreferences = {
   sortKey: "selection_priority",
 };
 
+export function normalizeCompanyListPreferences(
+  value: unknown,
+): NormalizationResult<CompanyListPreferences> {
+  if (!isRecord(value)) {
+    return { ok: false, message: "企業一覧設定の形式が不正です。" };
+  }
+  return {
+    ok: true,
+    value: {
+      sortKey:
+        typeof value.sortKey === "string" &&
+        COMPANY_LIST_SORT_KEYS.has(value.sortKey as CompanyListSortKey)
+          ? (value.sortKey as CompanyListSortKey)
+          : defaultCompanyListPreferences.sortKey,
+    },
+  };
+}
+
 export const companyListPreferencesStorage = {
   read: (): StorageResult<CompanyListPreferences> => {
     const result = readStorage<Partial<CompanyListPreferences>>(
@@ -294,16 +385,16 @@ export const companyListPreferencesStorage = {
       };
     }
 
-    return {
-      ok: true,
-      value: {
-        sortKey:
-          result.value.sortKey &&
-          COMPANY_LIST_SORT_KEYS.has(result.value.sortKey)
-            ? result.value.sortKey
-            : defaultCompanyListPreferences.sortKey,
-      },
-    };
+    const normalized = normalizeCompanyListPreferences(result.value);
+    if (!normalized.ok) {
+      return storageFailure(
+        "parse",
+        STORAGE_KEYS.companyListPreferences,
+        normalized.message,
+        defaultCompanyListPreferences,
+      );
+    }
+    return normalized;
   },
   write: (
     preferences: CompanyListPreferences,

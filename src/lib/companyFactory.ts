@@ -94,6 +94,7 @@ export function createCompany(values: CompanyFormValues): Company {
     webAppDevelopment: "unknown",
     strengths: values.strengths.trim(),
     concerns: values.concerns.trim(),
+    interviewConfirmationPoints: "",
     redFlags: "",
     notes: values.notes.trim(),
     motivationAppeal: "",
@@ -118,6 +119,7 @@ export function createCompany(values: CompanyFormValues): Company {
     judgmentSelection: { mode: "auto" },
     decisionEvaluation: {
       status: "unrated",
+      overallReview: "",
       scores: {
         jobFit: 0,
         careerFit: 0,

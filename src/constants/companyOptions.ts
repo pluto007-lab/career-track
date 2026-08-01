@@ -72,7 +72,7 @@ export const APPLICATION_STATUS_STYLES: Record<
   waiting_for_result: "border-sky-200 bg-sky-50 text-sky-900",
   offer: "border-emerald-200 bg-emerald-50 text-emerald-900",
   rejected: "border-red-200 bg-red-50 text-red-900",
-  withdrawn: "border-slate-300 bg-slate-100 text-slate-800",
+  withdrawn: "border-orange-300 bg-orange-50 text-orange-900",
   closed: "border-slate-300 bg-slate-100 text-slate-800",
   on_hold: "border-orange-200 bg-orange-50 text-orange-900",
 };

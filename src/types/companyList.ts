@@ -39,5 +39,6 @@ export type CompanyListTab =
   | "waiting_for_result"
   | "interview_scheduled"
   | "offer"
+  | "withdrawn"
   | "rejected"
   | "archived";

@@ -33,6 +33,10 @@ export interface EvaluationConsultationSummaryInput {
   manualJudgment?: Judgment;
   displayedJudgment: Judgment;
   screeningWarnings: readonly ScreeningWarning[];
+  strengths: string;
+  concerns: string;
+  interviewConfirmationPoints: string;
+  notes: string;
   jobPostingText: string;
   jobPostingInclusion: JobPostingInclusion;
 }
@@ -177,6 +181,20 @@ export function buildEvaluationConsultationSummary(
       "",
     );
   }
+
+  lines.push("【評価の参考情報】");
+  lines.push(`良い点：${valueOrMissing(input.strengths)}`);
+  lines.push(`気になる点：${valueOrMissing(input.concerns)}`);
+  lines.push(
+    `面接で確認したいこと：${valueOrMissing(
+      input.interviewConfirmationPoints,
+    )}`,
+  );
+  lines.push(`自由メモ：${valueOrMissing(input.notes)}`);
+  lines.push(
+    "※面接で確認したいことは未確認情報であり、確認済みの事実や自動減点として扱わないでください。",
+  );
+  lines.push("");
 
   lines.push("【足切り・注意点】");
   if (input.screeningWarnings.length === 0) {
