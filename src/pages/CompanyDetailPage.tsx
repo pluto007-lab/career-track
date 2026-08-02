@@ -4,6 +4,7 @@ import {
   BarChart3,
   ExternalLink,
   MessageSquareText,
+  MessagesSquare,
   Pencil,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -177,6 +178,19 @@ export function CompanyDetailPage() {
   }
 
   const source = company.source.trim();
+  const hasBeforeInterviewNotes = [
+    company.interviewConfirmationPoints,
+    company.interviewPreparation.expectedQuestions,
+    company.interviewPreparation.talkingPoints,
+    company.interviewPreparation.preparationNotes,
+  ].some((value) => value.trim());
+  const hasAfterInterviewNotes = [
+    company.interviewPreparation.askedQuestions,
+    company.interviewPreparation.interviewerImpression,
+    company.interviewPreparation.positiveReflection,
+    company.interviewPreparation.concernsAfterInterview,
+    company.interviewPreparation.nextImprovements,
+  ].some((value) => value.trim());
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-7 sm:px-6 lg:px-8">
@@ -220,14 +234,50 @@ export function CompanyDetailPage() {
           <MessageSquareText aria-hidden="true" size={17} />
           志望動機
         </Link>
+        <Link
+          to={`/companies/${company.id}/interview`}
+          aria-label={`${company.name}の面接対策を開く`}
+          className="inline-flex h-10 items-center gap-2 rounded-md border border-sky-300 bg-white px-4 text-sm font-semibold text-sky-800 hover:bg-sky-50"
+        >
+          <MessagesSquare aria-hidden="true" size={17} />
+          面接対策
+        </Link>
       </div>
 
       <div className="mb-6 flex flex-col gap-1 text-xs leading-5 text-slate-500 sm:flex-row sm:flex-wrap sm:gap-x-6">
         <p><span className="font-semibold text-slate-700">企業情報：</span>会社情報・応募状況・日程を編集</p>
         <p><span className="font-semibold text-slate-700">評価・メモ：</span>点数・総評・良い点・気になる点・面接確認事項を管理</p>
+        <p><span className="font-semibold text-slate-700">面接対策：</span>面接前の準備と面接後の振り返りを管理</p>
       </div>
 
       <div className="space-y-6">
+        <section className="border border-slate-200 bg-white p-5 sm:p-6">
+          <div className="flex flex-col gap-3 border-b border-slate-200 pb-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-base font-semibold text-slate-950">面接対策</h2>
+            <Link
+              to={`/companies/${company.id}/interview`}
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-sky-300 bg-white px-3 text-sm font-semibold text-sky-800 hover:bg-sky-50"
+            >
+              <MessagesSquare aria-hidden="true" size={16} />
+              面接対策を開く
+            </Link>
+          </div>
+          <dl className="mt-5 grid gap-4 sm:grid-cols-2">
+            <div>
+              <dt className="text-xs font-medium text-slate-500">面接前メモ</dt>
+              <dd className="mt-2 text-sm font-semibold text-slate-800">
+                {hasBeforeInterviewNotes ? "入力あり" : "未入力"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium text-slate-500">面接後振り返り</dt>
+              <dd className="mt-2 text-sm font-semibold text-slate-800">
+                {hasAfterInterviewNotes ? "入力あり" : "未入力"}
+              </dd>
+            </div>
+          </dl>
+        </section>
+
         <section className="border border-slate-200 bg-white p-5 sm:p-6">
           <h2 className="border-b border-slate-200 pb-3 text-base font-semibold text-slate-950">
             概要

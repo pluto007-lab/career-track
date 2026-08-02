@@ -2,11 +2,13 @@ import {
   EMPTY_APPLICANT_PROFILE,
   type ApplicantProfile,
 } from "../types/applicantProfile";
-import type {
-  ApplicationManagement,
-  CareerTrackSettings,
-  Company,
-  DecisionEvaluation,
+import {
+  EMPTY_INTERVIEW_PREPARATION,
+  type ApplicationManagement,
+  type CareerTrackSettings,
+  type Company,
+  type DecisionEvaluation,
+  type InterviewPreparation,
 } from "../types/company";
 import type {
   CompanyListPreferences,
@@ -113,6 +115,7 @@ export type PersistedCompany = Omit<
   | "motivationStatement"
   | "companySelfPromotion"
   | "interviewConfirmationPoints"
+  | "interviewPreparation"
   | "applicationManagement"
   | "decisionEvaluation"
 > &
@@ -128,6 +131,7 @@ export type PersistedCompany = Omit<
       | "motivationStatement"
       | "companySelfPromotion"
       | "interviewConfirmationPoints"
+      | "interviewPreparation"
       | "applicationManagement"
     >
   > & {
@@ -160,6 +164,18 @@ export type NormalizationResult<T> =
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function normalizeInterviewPreparation(value: unknown): InterviewPreparation {
+  if (!isRecord(value)) {
+    return { ...EMPTY_INTERVIEW_PREPARATION };
+  }
+
+  const normalized = { ...EMPTY_INTERVIEW_PREPARATION };
+  for (const key of Object.keys(normalized) as Array<keyof InterviewPreparation>) {
+    normalized[key] = typeof value[key] === "string" ? value[key] : "";
+  }
+  return normalized;
 }
 
 export function normalizeCompanies(value: unknown): NormalizationResult<Company[]> {
@@ -202,6 +218,9 @@ export function normalizeCompanies(value: unknown): NormalizationResult<Company[
       motivationStatement: company.motivationStatement ?? "",
       companySelfPromotion: company.companySelfPromotion ?? "",
       interviewConfirmationPoints: company.interviewConfirmationPoints ?? "",
+      interviewPreparation: normalizeInterviewPreparation(
+        company.interviewPreparation,
+      ),
       applicationManagement,
       decisionEvaluation: {
         ...EMPTY_DECISION_EVALUATION,

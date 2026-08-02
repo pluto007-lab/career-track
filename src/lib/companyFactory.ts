@@ -1,4 +1,8 @@
-import type { Company, CompanyFormValues } from "../types/company";
+import {
+  EMPTY_INTERVIEW_PREPARATION,
+  type Company,
+  type CompanyFormValues,
+} from "../types/company";
 import {
   jstLocalDateTimeToUtcIso,
   utcIsoToJstLocalDateTime,
@@ -95,6 +99,7 @@ export function createCompany(values: CompanyFormValues): Company {
     strengths: values.strengths.trim(),
     concerns: values.concerns.trim(),
     interviewConfirmationPoints: "",
+    interviewPreparation: { ...EMPTY_INTERVIEW_PREPARATION },
     redFlags: "",
     notes: values.notes.trim(),
     motivationAppeal: "",

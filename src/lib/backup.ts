@@ -137,6 +137,30 @@ function validateCompanyCore(value: unknown): string | null {
     return `「${value.name}」の評価または面接データの形式が不正です。`;
   }
 
+  if (value.interviewPreparation !== undefined) {
+    const preparation = value.interviewPreparation;
+    const preparationKeys = [
+      "expectedQuestions",
+      "talkingPoints",
+      "preparationNotes",
+      "askedQuestions",
+      "interviewerImpression",
+      "positiveReflection",
+      "concernsAfterInterview",
+      "nextImprovements",
+    ] as const;
+    if (
+      !isRecord(preparation) ||
+      preparationKeys.some(
+        (key) =>
+          preparation[key] !== undefined &&
+          typeof preparation[key] !== "string",
+      )
+    ) {
+      return `「${value.name}」の面接対策データの形式が不正です。`;
+    }
+  }
+
   const optionalStrings = [
     "appliedAt",
     "documentDeadline",

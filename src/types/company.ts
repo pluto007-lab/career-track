@@ -164,6 +164,28 @@ export interface ApplicationManagement {
   notes: string;
 }
 
+export interface InterviewPreparation {
+  expectedQuestions: string;
+  talkingPoints: string;
+  preparationNotes: string;
+  askedQuestions: string;
+  interviewerImpression: string;
+  positiveReflection: string;
+  concernsAfterInterview: string;
+  nextImprovements: string;
+}
+
+export const EMPTY_INTERVIEW_PREPARATION: InterviewPreparation = {
+  expectedQuestions: "",
+  talkingPoints: "",
+  preparationNotes: "",
+  askedQuestions: "",
+  interviewerImpression: "",
+  positiveReflection: "",
+  concernsAfterInterview: "",
+  nextImprovements: "",
+};
+
 export interface Company {
   id: string;
   archived: boolean;
@@ -213,6 +235,7 @@ export interface Company {
   strengths: string;
   concerns: string;
   interviewConfirmationPoints: string;
+  interviewPreparation: InterviewPreparation;
   redFlags: string;
   notes: string;
   motivationAppeal: string;

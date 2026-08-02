@@ -11,6 +11,7 @@ import { CompanyMotivationPage } from "./pages/CompanyMotivationPage";
 import { ApplicationManagementPage } from "./pages/ApplicationManagementPage";
 import { CompanyDetailPage } from "./pages/CompanyDetailPage";
 import { DataManagementPage } from "./pages/DataManagementPage";
+import { CompanyInterviewPage } from "./pages/CompanyInterviewPage";
 
 export const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ export const router = createBrowserRouter([
       {
         path: "companies/:companyId/motivation",
         element: <CompanyMotivationPage />,
+      },
+      {
+        path: "companies/:companyId/interview",
+        element: <CompanyInterviewPage />,
       },
       {
         path: "settings/profile",
